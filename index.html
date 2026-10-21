@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>桿道夫《時光扭蛋大作戰》</title>
+  <!-- LINE LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans TC', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #111424;
+      background-image: 
+        radial-gradient(#1f2544 15%, transparent 16%), 
+        linear-gradient(to bottom, #111424 0%, #080a12 100%);
+      background-size: 20px 20px, 100% 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 14px;
+      color: #fff;
+    }
+
+    .arcade-badge {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #00f0ff;
+      background: #000;
+      border: 1px solid #00f0ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    }
+
+    .main-title {
+      font-size: 22px;
+      font-weight: 900;
+      text-align: center;
+      color: #ffd000;
+      text-shadow: 3px 3px 0px #ff0055, 0 0 15px rgba(255, 208, 0, 0.4);
+      letter-spacing: 1px;
+      line-height: 1.3;
+    }
+
+    .sub-slogan {
+      font-size: 13px;
+      color: #a8dadc;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .user-tag {
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px dashed #4cc9f0;
+      color: #4cc9f0;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+
+    /* 扭蛋機本體 */
+    .machine-wrapper {
+      position: relative;
+      width: 270px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .globe {
+      width: 230px;
+      height: 230px;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 60%, rgba(76,201,240,0.25) 100%);
+      border: 6px solid #ff0055;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 25px rgba(255,255,255,0.4), 0 8px 25px rgba(255, 0, 85, 0.35);
+      z-index: 2;
+    }
+
+    .globe::after {
+      content: "";
+      position: absolute;
+      top: 22px;
+      left: 30px;
+      width: 40px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      transform: rotate(-35deg);
+    }
+
+    /* 彩蛋視覺 */
+    .mini-ball {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      box-shadow: inset -3px -3px 6px rgba(0,0,0,0.35), 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .ball-gold  { background: linear-gradient(135deg, #ffd700 50%, #d4af37 50%); bottom: 25px; left: 50px; }
+    .ball-red   { background: linear-gradient(135deg, #ff1744 50%, #b71c1c 50%); bottom: 30px; right: 45px; }
+    .ball-blue  { background: linear-gradient(135deg, #00d2ff 50%, #0077b6 50%); bottom: 70px; left: 90px; }
+    .ball-pink  { background: linear-gradient(135deg, #ff70a6 50%, #ff0a54 50%); bottom: 75px; left: 35px; }
+    .ball-extra { background: linear-gradient(135deg, #70e000 50%, #38b000 50%); bottom: 70px; right: 35px; }
+
+    /* 機身底座 */
+    .base {
+      width: 250px;
+      height: 190px;
+      background: linear-gradient(180deg, #e63946 0%, #9d0208 100%);
+      border-radius: 16px 16px 36px 36px;
+      margin-top: -28px;
+      padding-top: 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 4px solid #590d16;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      z-index: 1;
+    }
+
+    .crank-box {
+      width: 90px;
+      height: 90px;
+      background: #e5e5e5;
+      border-radius: 50%;
+      border: 4px solid #777;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+
+    .crank-handle {
+      width: 22px;
+      height: 72px;
+      background: #adb5bd;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+      transition: transform 0.6s cubic-bezier(0.4, 2, 0.6, 1);
+    }
+
+    .slot-exit {
+      width: 80px;
+      height: 22px;
+      background: #111;
+      border-radius: 10px;
+      margin-top: 14px;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.9);
+    }
+
+    .action-btn {
+      margin-top: 22px;
+      padding: 14px 44px;
+      background: linear-gradient(180deg, #ffd000 0%, #ff8c00 100%);
+      color: #1a1a1a;
+      font-size: 17px;
+      font-weight: 900;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+      transition: transform 0.1s, opacity 0.2s;
+      letter-spacing: 1px;
+    }
+    .action-btn:active {
+      transform: scale(0.96);
+    }
+    .action-btn:disabled {
+      background: #4a4e69;
+      color: #9a8c98;
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    .shaking {
+      animation: shake 0.5s infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-3px, 2px) rotate(-1deg); }
+      50% { transform: translate(3px, -2px) rotate(1deg); }
+      75% { transform: translate(-2px, -3px) rotate(-1deg); }
+    }
+
+    /* 票券彈窗 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .voucher-card {
+      background: #fff;
+      color: #2b2d42;
+      border-radius: 18px;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      animation: popUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popUp {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .capsule-badge {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: -50px auto 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+      border: 3px solid #fff;
+    }
+
+    .voucher-tier {
+      font-size: 14px;
+      font-weight: 900;
+      color: #e63946;
+      letter-spacing: 1px;
+    }
+    .voucher-name {
+      font-size: 21px;
+      font-weight: 900;
+      color: #111424;
+      margin: 6px 0 10px;
+    }
+    .voucher-rule {
+      font-size: 13px;
+      color: #555;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .clerk-btn {
+      width: 100%;
+      padding: 12px;
+      background: #2b2d42;
+      color: #fff;
+      border: 2px dashed #ff0055;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .clerk-btn:disabled {
+      background: #adb5bd;
+      border: 2px solid #ced4da;
+      color: #495057;
+      cursor: not-allowed;
+    }
+
+    .timestamp-box {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #2b9348;
+      font-weight: 700;
+    }
+
+    #loadingMask {
+      position: fixed;
+      inset: 0;
+      background: #111424;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      font-size: 15px;
+      color: #ffd000;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loadingMask">
+    <div style="font-family:'Press Start 2P'; font-size:12px; margin-bottom:12px; color:#00f0ff;">SYSTEM LOADING...</div>
+    <span id="loadingMsg">正在驗證 LINE 帳號資格...</span>
+  </div>
+
+  <div class="arcade-badge">2026 TAICHUNG SHOPPING FESTIVAL</div>
+  <div class="main-title">桿道夫・時光扭蛋大作戰</div>
+  <div class="sub-slogan">滿千轉好運・轉出你的命定驚喜</div>
+  <div class="user-tag" id="userGreeting">驗證身分中...</div>
+
+  <div class="machine-wrapper">
+    <div class="globe" id="globe">
+      <div class="mini-ball ball-gold"></div>
+      <div class="mini-ball ball-red"></div>
+      <div class="mini-ball ball-blue"></div>
+      <div class="mini-ball ball-pink"></div>
+      <div class="mini-ball ball-extra"></div>
+    </div>
+    <div class="base">
+      <div class="crank-box" id="crankBox">
+        <div class="crank-handle" id="crankHandle"></div>
+      </div>
+      <div class="slot-exit"></div>
+    </div>
+  </div>
+
+  <button class="action-btn" id="drawBtn">轉動時光扭蛋！</button>
+
+  <div class="modal-overlay" id="voucherModal">
+    <div class="voucher-card">
+      <div class="capsule-badge" id="capsuleBadge"></div>
+      <div class="voucher-tier" id="vTier"></div>
+      <div class="voucher-name" id="vName"></div>
+      <div class="voucher-rule" id="vRule"></div>
+
+      <button class="clerk-btn" id="clerkRedeemBtn">【門市人員專用】點擊核銷兌獎</button>
+      <div class="timestamp-box" id="redeemTimestamp"></div>
+    </div>
+  </div>
+
+  <script>
+    // 已自動填入你的專屬設定
+    const MY_LIFF_ID = "2012132914-DXAJBdEc";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwEAZ5S0hgR6buglNsYmrYa548ELcxmS6PAnLuXaPNp8d3b_23xk_BX9OK36sGHzbO29A/exec";
+
+    const PRIZES = [
+      {
+        tierKey: "特獎",
+        tier: "特獎｜閃耀金蛋",
+        name: "桿道夫第二人 8 折",
+        rule: "現場/下次消費使用，折抵以價低者計。出示由店員核銷。",
+        weight: 5,
+        color: "linear-gradient(135deg, #ffd700 50%, #d4af37 50%)"
+      },
+      {
+        tierKey: "貳獎",
+        tier: "貳獎｜街機紅蛋",
+        name: "限定 L 夾乙個",
+        rule: "款式隨機發放，出示中獎畫面由店員核銷領取。",
+        weight: 25,
+        color: "linear-gradient(135deg, #ff1744 50%, #b71c1c 50%)"
+      },
+      {
+        tierKey: "參獎",
+        tier: "參獎｜像素藍蛋",
+        name: "精美明信片乙張",
+        rule: "款式隨機發放，出示中獎畫面由店員核銷領取。",
+        weight: 30,
+        color: "linear-gradient(135deg, #00d2ff 50%, #0077b6 50%)"
+      },
+      {
+        tierKey: "同樂獎",
+        tier: "同樂獎｜俏皮粉蛋",
+        name: "店員愛的鼓勵乙次",
+        rule: "保底幸運獎！由店員現場核銷後，送上熱情掌聲與元氣祝福！",
+        weight: 40,
+        color: "linear-gradient(135deg, #ff70a6 50%, #ff0a54 50%)"
+      }
+    ];
+
+    let currentUserId = "";
+    let currentUserName = "";
+    let isDrawing = false;
+    let crankDegree = 0;
+
+    const drawBtn = document.getElementById("drawBtn");
+    const crankBox = document.getElementById("crankBox");
+    const crankHandle = document.getElementById("crankHandle");
+    const globe = document.getElementById("globe");
+    const voucherModal = document.getElementById("voucherModal");
+    const clerkRedeemBtn = document.getElementById("clerkRedeemBtn");
+    const redeemTimestamp = document.getElementById("redeemTimestamp");
+    const loadingMask = document.getElementById("loadingMask");
+    const loadingMsg = document.getElementById("loadingMsg");
+    const userGreeting = document.getElementById("userGreeting");
+
+    async function initApp() {
+      try {
+        await liff.init({ liffId: MY_LIFF_ID });
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        const profile = await liff.getProfile();
+        currentUserId = profile.userId;
+        currentUserName = profile.displayName;
+        userGreeting.innerText = `玩家：${currentUserName}`;
+
+        loadingMsg.innerText = "查詢歷史抽獎資格中...";
+        await checkRemoteStatus();
+        loadingMask.style.display = "none";
+      } catch (err) {
+        console.error(err);
+        loadingMask.innerText = "LINE 身分驗證失敗，請重新開啟。";
+      }
+    }
+
+    async function checkRemoteStatus() {
+      try {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "check", userId: currentUserId })
+        });
+        const result = await res.json();
+
+        if (result.hasDrawn) {
+          const matched = PRIZES.find(p => p.name === result.prizeName) || PRIZES[3];
+          const record = {
+            prize: matched,
+            isRedeemed: result.isRedeemed,
+            redeemedAt: result.redeemedAt
+          };
+          applyDrawnState(record);
+        } else {
+          drawBtn.onclick = triggerGashapon;
+          crankBox.onclick = triggerGashapon;
+        }
+      } catch (e) {
+        // 備用快取防斷線
+        const local = localStorage.getItem(`gandalf_${currentUserId}`);
+        if (local) {
+          applyDrawnState(JSON.parse(local));
+        } else {
+          drawBtn.onclick = triggerGashapon;
+          crankBox.onclick = triggerGashapon;
+        }
+      }
+    }
+
+    function applyDrawnState(record) {
+      drawBtn.innerText = "已參加過活動（檢視獎券）";
+      drawBtn.disabled = false;
+      drawBtn.onclick = () => renderVoucher(record);
+      crankBox.onclick = () => renderVoucher(record);
+      renderVoucher(record);
+    }
+
+    function drawPrize() {
+      const totalWeight = PRIZES.reduce((sum, p) => sum + p.weight, 0);
+      let rand = Math.random() * totalWeight;
+      for (let p of PRIZES) {
+        if (rand < p.weight) return p;
+        rand -= p.weight;
+      }
+      return PRIZES[PRIZES.length - 1];
+    }
+
+    async function triggerGashapon() {
+      if (isDrawing || drawBtn.disabled) return;
+      isDrawing = true;
+      drawBtn.disabled = true;
+
+      crankDegree += 360;
+      crankHandle.style.transform = `rotate(${crankDegree}deg)`;
+      globe.classList.add("shaking");
+
+      const wonPrize = drawPrize();
+
+      const userRecord = {
+        prize: wonPrize,
+        isRedeemed: false,
+        redeemedAt: null
+      };
+
+      // 寫入 Google 試算表
+      try {
+        fetch(GAS_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "draw",
+            userId: currentUserId,
+            userName: currentUserName,
+            prizeName: wonPrize.name,
+            prizeTier: wonPrize.tierKey
+          })
+        });
+      } catch (e) { console.error(e); }
+
+      localStorage.setItem(`gandalf_${currentUserId}`, JSON.stringify(userRecord));
+
+      setTimeout(() => {
+        globe.classList.remove("shaking");
+        isDrawing = false;
+        applyDrawnState(userRecord);
+      }, 1300);
+    }
+
+    function renderVoucher(record) {
+      document.getElementById("capsuleBadge").style.background = record.prize.color;
+      document.getElementById("vTier").innerText = record.prize.tier;
+      document.getElementById("vName").innerText = record.prize.name;
+      document.getElementById("vRule").innerText = record.prize.rule;
+
+      if (record.isRedeemed) {
+        clerkRedeemBtn.disabled = true;
+        clerkRedeemBtn.innerText = "✓ 本券已完成門市核銷";
+        redeemTimestamp.innerText = `核銷時間：${record.redeemedAt || "已核銷"}`;
+      } else {
+        clerkRedeemBtn.disabled = false;
+        clerkRedeemBtn.innerText = "【門市人員專用】點擊核銷兌獎";
+        redeemTimestamp.innerText = "";
+        
+        clerkRedeemBtn.onclick = async () => {
+          const ok = confirm("【店員核銷確認】\n請確認客人符合消費滿千資格。\n點擊「確定」即完成核銷且無法復原。");
+          if (ok) {
+            clerkRedeemBtn.disabled = true;
+            clerkRedeemBtn.innerText = "核銷處理中...";
+
+            const nowTime = new Date().toLocaleString("zh-TW", { hour12: false });
+            record.isRedeemed = true;
+            record.redeemedAt = nowTime;
+
+            try {
+              await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "redeem", userId: currentUserId })
+              });
+            } catch (e) { console.error(e); }
+
+            localStorage.setItem(`gandalf_${currentUserId}`, JSON.stringify(record));
+            renderVoucher(record);
+            alert("✓ 核銷成功！請依獎項發放贈品。");
+          }
+        };
+      }
+
+      voucherModal.classList.add("active");
+    }
+
+    voucherModal.onclick = (e) => {
+      if (e.target === voucherModal) voucherModal.classList.remove("active");
+    };
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
