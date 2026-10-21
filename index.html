@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>桿道夫《時光扭蛋大作戰》</title>
+  <title>幻覺博物館《時光扭蛋大作戰》</title>
   <!-- LINE LIFF SDK -->
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
@@ -316,7 +316,7 @@
   </div>
 
   <div class="arcade-badge">2026 TAICHUNG SHOPPING FESTIVAL</div>
-  <div class="main-title">桿道夫・時光扭蛋大作戰</div>
+  <div class="main-title">幻覺博物館・時光扭蛋大作戰</div>
   <div class="sub-slogan">滿千轉好運・轉出你的命定驚喜</div>
   <div class="user-tag" id="userGreeting">驗證身分中...</div>
 
@@ -351,7 +351,6 @@
   </div>
 
   <script>
-    // 已自動填入你的專屬設定
     const MY_LIFF_ID = "2012132914-DXAJBdEc";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwEAZ5S0hgR6buglNsYmrYa548ELcxmS6PAnLuXaPNp8d3b_23xk_BX9OK36sGHzbO29A/exec";
 
@@ -359,7 +358,7 @@
       {
         tierKey: "特獎",
         tier: "特獎｜閃耀金蛋",
-        name: "桿道夫第二人 8 折",
+        name: "幻覺博物館第二人 8 折",
         rule: "現場/下次消費使用，折抵以價低者計。出示由店員核銷。",
         weight: 5,
         color: "linear-gradient(135deg, #ffd700 50%, #d4af37 50%)"
@@ -449,8 +448,7 @@
           crankBox.onclick = triggerGashapon;
         }
       } catch (e) {
-        // 備用快取防斷線
-        const local = localStorage.getItem(`gandalf_${currentUserId}`);
+        const local = localStorage.getItem(`museum_${currentUserId}`);
         if (local) {
           applyDrawnState(JSON.parse(local));
         } else {
@@ -495,7 +493,6 @@
         redeemedAt: null
       };
 
-      // 寫入 Google 試算表
       try {
         fetch(GAS_URL, {
           method: "POST",
@@ -509,7 +506,7 @@
         });
       } catch (e) { console.error(e); }
 
-      localStorage.setItem(`gandalf_${currentUserId}`, JSON.stringify(userRecord));
+      localStorage.setItem(`museum_${currentUserId}`, JSON.stringify(userRecord));
 
       setTimeout(() => {
         globe.classList.remove("shaking");
@@ -550,7 +547,7 @@
               });
             } catch (e) { console.error(e); }
 
-            localStorage.setItem(`gandalf_${currentUserId}`, JSON.stringify(record));
+            localStorage.setItem(`museum_${currentUserId}`, JSON.stringify(record));
             renderVoucher(record);
             alert("✓ 核銷成功！請依獎項發放贈品。");
           }
